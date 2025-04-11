@@ -1,1 +1,1 @@
-![SonarQube](https://sonarqube.cs.ui.ac.id/api/project_badges/measure?project=coupon-service-rizzerve&metric=alert_status)
+[![Quality Gate Status](https://sonarqube.cs.ui.ac.id/api/project_badges/measure?project=coupon-service-rizzerve&metric=alert_status&token=sqb_df390da07570f8cdbe48075f7629ef87509c27cb)](https://sonarqube.cs.ui.ac.id/dashboard?id=coupon-service-rizzerve)
