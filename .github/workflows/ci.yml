@@ -29,6 +29,9 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v2.0.2
         with:
           projectBaseDir: .
+          args: >
+            -Dsonar.projectKey=coupon-service-rizzerve
+            -Dsonar.projectName=coupon-service-rizzerve
+            -Dsonar.host.url=https://sonarqube.cs.ui.ac.id
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "https://sonarqube.cs.ui.ac.id"
