@@ -11,7 +11,11 @@ public class Coupon {
     private boolean used;
 
     public Coupon(String code, String type, BigDecimal value, LocalDateTime expiredAt, boolean used) {
-
+        this.code = code;
+        this.type = type;
+        this.value = value;
+        this.expiredAt = expiredAt;
+        this.used = used;
     }
 
     public boolean isExpired() {
