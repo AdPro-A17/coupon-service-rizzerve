@@ -24,3 +24,11 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew test
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v2.0.2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: "https://sonarqube.cs.ui.ac.id"

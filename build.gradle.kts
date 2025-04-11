@@ -1,9 +1,19 @@
 plugins {
 	java
 	jacoco
+	id("org.sonarqube") version "6.1.0.5360"
 	id("org.springframework.boot") version "3.4.4"
 	id("io.spring.dependency-management") version "1.1.7"
 }
+
+sonar {
+	properties {
+		property("sonar.projectKey", "coupon-service-rizzerve")
+		property("sonar.projectName", "coupon-service-rizzerve")
+		property("sonar.host.url", "https://sonarqube.cs.ui.ac.id")
+	}
+}
+
 
 group = "id.ac.ui.cs.advprog"
 version = "0.0.1-SNAPSHOT"
