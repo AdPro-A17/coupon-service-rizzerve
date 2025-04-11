@@ -8,10 +8,10 @@ public class CouponRepository {
     private final ConcurrentHashMap<String, Coupon> store = new ConcurrentHashMap<>();
 
     public Coupon find(String code) {
-
+        return store.get(code);
     }
 
     public void save(Coupon coupon) {
-
+        store.put(coupon.getCode(), coupon);
     }
 }
