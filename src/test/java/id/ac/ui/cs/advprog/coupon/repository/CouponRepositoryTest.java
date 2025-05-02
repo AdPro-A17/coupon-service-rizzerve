@@ -19,7 +19,7 @@ public class CouponRepositoryTest {
 
     @Test
     void testSaveAndFindCoupon() {
-        Coupon coupon = new Coupon("SAVE10", "PERCENTAGE", new BigDecimal("0.1"), LocalDateTime.now().plusDays(1), false);
+        Coupon coupon = new Coupon("SAVE10", "PERCENTAGE", new BigDecimal("0.1"),new BigDecimal("0.0"), LocalDateTime.now().plusDays(1), false);
         repository.save(coupon);
 
         Coupon result = repository.find("SAVE10");

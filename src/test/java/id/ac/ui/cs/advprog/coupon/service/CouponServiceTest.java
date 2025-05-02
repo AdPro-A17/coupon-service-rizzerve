@@ -21,7 +21,7 @@ public class CouponServiceTest {
         DiscountStrategyFactory factory = new DiscountStrategyFactory();
         couponService = new CouponService(repository, factory);
 
-        Coupon coupon = new Coupon("DISKON10", "PERCENTAGE", new BigDecimal("0.1"), LocalDateTime.now().plusDays(1), false);
+        Coupon coupon = new Coupon("DISKON10", "PERCENTAGE", new BigDecimal("0.1"), new BigDecimal("0"),LocalDateTime.now().plusDays(1), false);
         repository.save(coupon);
     }
 
@@ -34,7 +34,7 @@ public class CouponServiceTest {
 
     @Test
     void testApplyExpiredCouponShouldThrow() {
-        Coupon expired = new Coupon("EXPIRED", "PERCENTAGE", new BigDecimal("0.1"), LocalDateTime.now().minusDays(1), false);
+        Coupon expired = new Coupon("EXPIRED", "PERCENTAGE", new BigDecimal("0.1"), new BigDecimal("0"),LocalDateTime.now().minusDays(1), false);
         repository.save(expired);
 
         assertThrows(IllegalStateException.class, () ->
