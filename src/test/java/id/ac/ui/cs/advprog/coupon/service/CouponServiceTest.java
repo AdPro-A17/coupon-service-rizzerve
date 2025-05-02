@@ -28,9 +28,16 @@ public class CouponServiceTest {
     @Test
     void testApplyValidPercentageCoupon() {
         BigDecimal total = new BigDecimal("100000");
+
+        Coupon coupon = new Coupon("DISKON10", "PERCENTAGE", new BigDecimal("10"), new BigDecimal("0"),
+                LocalDateTime.now().plusDays(1), false);
+        repository.save(coupon);
+
         BigDecimal result = couponService.applyCoupon("DISKON10", total);
-        assertEquals(new BigDecimal("90000.0"), result);
+        assertEquals(0, result.compareTo(new BigDecimal("90000")));
     }
+
+
 
     @Test
     void testApplyExpiredCouponShouldThrow() {
