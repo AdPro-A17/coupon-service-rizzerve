@@ -9,7 +9,7 @@ public class Coupon {
     private BigDecimal value;
     private LocalDateTime expiredAt;
     private boolean used;
-
+    
     public Coupon(String code, String type, BigDecimal value, LocalDateTime expiredAt, boolean used) {
         this.code = code;
         this.type = type;
@@ -17,7 +17,7 @@ public class Coupon {
         this.expiredAt = expiredAt;
         this.used = used;
     }
-
+    
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiredAt);
     }
