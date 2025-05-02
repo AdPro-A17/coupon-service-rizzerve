@@ -18,10 +18,13 @@ public class CouponService {
 
     public BigDecimal applyCoupon(String code, BigDecimal total) {
         Coupon coupon = repository.find(code);
-        if (coupon == null || !coupon.isUsable()) throw new IllegalStateException("Invalid or expired coupon");
+        if (coupon == null || !coupon.isUsable(total)) {
+            throw new IllegalStateException("Invalid or expired or insufficient purchase");
+        }
 
         DiscountStrategy strategy = factory.resolve(coupon);
+        BigDecimal discounted = strategy.apply(total);
         coupon.setUsed(true);
-        return strategy.apply(total);
+        return discounted;
     }
 }

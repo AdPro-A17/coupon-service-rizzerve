@@ -35,5 +35,4 @@ public class CouponTest {
         assertFalse(coupon.isExpired());
         assertTrue(coupon.isUsable(new BigDecimal("100"))); // total belanja besar
     }
-
 }

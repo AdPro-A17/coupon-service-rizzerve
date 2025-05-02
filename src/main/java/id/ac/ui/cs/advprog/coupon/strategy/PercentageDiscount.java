@@ -3,14 +3,14 @@ package id.ac.ui.cs.advprog.coupon.strategy;
 import java.math.BigDecimal;
 
 public class PercentageDiscount implements DiscountStrategy {
-    private final BigDecimal percentage;
+    private final BigDecimal percent;
 
-    public PercentageDiscount(BigDecimal percentage) {
-        this.percentage = percentage;
+    public PercentageDiscount(BigDecimal percent) {
+        this.percent = percent;
     }
 
     @Override
     public BigDecimal apply(BigDecimal total) {
-        return total.subtract(total.multiply(percentage));
+        return total.multiply(BigDecimal.ONE.subtract(percent.divide(BigDecimal.valueOf(100))));
     }
 }
