@@ -34,4 +34,33 @@ public class CouponRepositoryTest {
         Coupon result = repository.find("UNKNOWN");
         assertNull(result);
     }
+
+    @Test
+    void testUpdateCouponOverwritesExisting() {
+        Coupon original = new Coupon("UPDATE1", "FIXED", new BigDecimal("5000"),
+                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 5);
+        repository.save(original);
+
+        Coupon updated = new Coupon("UPDATE1", "FIXED", new BigDecimal("10000"),
+                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 10);
+        repository.save(updated); // overwrite
+
+        Coupon result = repository.find("UPDATE1");
+        assertNotNull(result);
+        assertEquals(new BigDecimal("10000"), result.getValue());
+        assertEquals(10, result.getQuota());
+    }
+
+    @Test
+    void testDeleteCoupon() {
+        Coupon coupon = new Coupon("DELETE1", "PERCENTAGE", new BigDecimal("5"),
+                new BigDecimal("10000"), LocalDateTime.now().plusDays(1), 5);
+        repository.save(coupon);
+
+        // Simulasi delete manual
+        repository.delete("DELETE1");
+
+        Coupon result = repository.find("DELETE1");
+        assertNull(result);
+    }
 }
