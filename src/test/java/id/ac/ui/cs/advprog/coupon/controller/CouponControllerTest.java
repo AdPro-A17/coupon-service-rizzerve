@@ -62,13 +62,18 @@ public class CouponControllerTest {
 
     @Test
     void testGetCoupon() throws Exception {
-        when(couponRepository.find("TEST")).thenReturn(coupon);
+        Coupon coupon = new Coupon("TEST", "FIXED", new BigDecimal("10000"),
+                new BigDecimal("50000"), LocalDateTime.now().plusDays(1), 10);
+        coupon.setUsedCount(0);
+
+        when(couponService.getCoupon("TEST")).thenReturn(coupon);
 
         mockMvc.perform(get("/coupon/TEST"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("TEST"))
                 .andExpect(jsonPath("$.type").value("FIXED"));
     }
+
 
     @Test
     void testUpdateCoupon() throws Exception {

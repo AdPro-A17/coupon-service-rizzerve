@@ -1,67 +1,79 @@
 package id.ac.ui.cs.advprog.coupon.controller;
 
 import id.ac.ui.cs.advprog.coupon.model.Coupon;
-import id.ac.ui.cs.advprog.coupon.repository.CouponRepository;
 import id.ac.ui.cs.advprog.coupon.service.CouponService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/coupon")
 public class CouponController {
 
     private final CouponService couponService;
-    private final CouponRepository couponRepository;
 
-    public CouponController(CouponService couponService, CouponRepository couponRepository) {
+    public CouponController(CouponService couponService) {
         this.couponService = couponService;
-        this.couponRepository = couponRepository;
     }
 
     @PostMapping
     public String createCoupon(@RequestBody CouponRequest request) {
-        Coupon coupon = toCoupon(request);
-        couponRepository.save(coupon);
-        return "Coupon created successfully";
+        try {
+            couponService.createCoupon(toCoupon(request));
+            return "Coupon created successfully";
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
     }
 
     @GetMapping("/{code}")
     public Coupon getCoupon(@PathVariable String code) {
-        Coupon coupon = couponRepository.find(code);
-        if (coupon == null) throw new IllegalArgumentException("Coupon not found");
-        return coupon;
+        try {
+            return couponService.getCoupon(code);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PutMapping("/{code}")
     public String updateCoupon(@PathVariable String code, @RequestBody CouponRequest request) {
         if (!code.equals(request.getCode())) {
-            throw new IllegalArgumentException("Coupon code mismatch");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coupon code mismatch");
         }
-
-        if (couponRepository.find(code) == null) {
-            throw new IllegalArgumentException("Coupon not found");
+        try {
+            couponService.updateCoupon(toCoupon(request));
+            return "Coupon updated successfully";
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-
-        Coupon updated = toCoupon(request);
-        couponRepository.update(updated);
-        return "Coupon updated successfully";
     }
 
     @DeleteMapping("/{code}")
     public String deleteCoupon(@PathVariable String code) {
-        if (couponRepository.find(code) == null) {
-            throw new IllegalArgumentException("Coupon not found");
+        try {
+            couponService.deleteCoupon(code);
+            return "Coupon deleted successfully";
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
+    }
 
-        couponRepository.delete(code);
-        return "Coupon deleted successfully";
+    @GetMapping
+    public Collection<Coupon> listCoupons() {
+        return couponService.getAllCoupons();
     }
 
     @PostMapping("/{code}/apply")
     public BigDecimal applyCoupon(@PathVariable String code, @RequestParam BigDecimal total) {
-        return couponService.applyCoupon(code, total);
+        try {
+            return couponService.applyCoupon(code, total);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     private Coupon toCoupon(CouponRequest request) {
@@ -86,7 +98,7 @@ public class CouponController {
         private int quota;
         private int usedCount;
 
-        // Getters & Setters (sama seperti sebelumnya)
+        // Getters & Setters
         public String getCode() { return code; }
         public void setCode(String code) { this.code = code; }
 
