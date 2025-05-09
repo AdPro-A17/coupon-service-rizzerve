@@ -63,4 +63,16 @@ public class CouponServiceTest {
                 couponService.applyCoupon("EXHAUSTED", new BigDecimal("30000"))
         );
     }
+
+    @Test
+    void testUsedCountIncrementedAfterApply() {
+        Coupon coupon = repository.find("DISKON10");
+        assertEquals(0, coupon.getUsedCount());
+
+        couponService.applyCoupon("DISKON10", new BigDecimal("100000"));
+
+        Coupon updated = repository.find("DISKON10");
+        assertEquals(1, updated.getUsedCount());
+    }
+
 }
