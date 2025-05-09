@@ -19,13 +19,14 @@ public class CouponRepositoryTest {
 
     @Test
     void testSaveAndFindCoupon() {
-        Coupon coupon = new Coupon("SAVE10", "PERCENTAGE", new BigDecimal("0.1"),new BigDecimal("0.0"), LocalDateTime.now().plusDays(1), false);
+        Coupon coupon = new Coupon("SAVE10", "PERCENTAGE", new BigDecimal("10"),
+                new BigDecimal("0.0"), LocalDateTime.now().plusDays(1), 10);
         repository.save(coupon);
 
         Coupon result = repository.find("SAVE10");
         assertNotNull(result);
         assertEquals("SAVE10", result.getCode());
-        assertEquals(new BigDecimal("0.1"), result.getValue());
+        assertEquals(new BigDecimal("10"), result.getValue());
     }
 
     @Test

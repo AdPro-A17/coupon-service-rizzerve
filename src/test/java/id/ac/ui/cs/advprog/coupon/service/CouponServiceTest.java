@@ -21,7 +21,8 @@ public class CouponServiceTest {
         DiscountStrategyFactory factory = new DiscountStrategyFactory();
         couponService = new CouponService(repository, factory);
 
-        Coupon coupon = new Coupon("DISKON10", "PERCENTAGE", new BigDecimal("0.1"), new BigDecimal("0"),LocalDateTime.now().plusDays(1), false);
+        Coupon coupon = new Coupon("DISKON10", "PERCENTAGE", new BigDecimal("10"),
+                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 5);
         repository.save(coupon);
     }
 
@@ -29,19 +30,14 @@ public class CouponServiceTest {
     void testApplyValidPercentageCoupon() {
         BigDecimal total = new BigDecimal("100000");
 
-        Coupon coupon = new Coupon("DISKON10", "PERCENTAGE", new BigDecimal("10"), new BigDecimal("0"),
-                LocalDateTime.now().plusDays(1), false);
-        repository.save(coupon);
-
         BigDecimal result = couponService.applyCoupon("DISKON10", total);
         assertEquals(0, result.compareTo(new BigDecimal("90000")));
     }
 
-
-
     @Test
     void testApplyExpiredCouponShouldThrow() {
-        Coupon expired = new Coupon("EXPIRED", "PERCENTAGE", new BigDecimal("0.1"), new BigDecimal("0"),LocalDateTime.now().minusDays(1), false);
+        Coupon expired = new Coupon("EXPIRED", "PERCENTAGE", new BigDecimal("10"),
+                new BigDecimal("0"), LocalDateTime.now().minusDays(1), 5);
         repository.save(expired);
 
         assertThrows(IllegalStateException.class, () ->
@@ -53,6 +49,18 @@ public class CouponServiceTest {
     void testApplyNonexistentCouponShouldThrow() {
         assertThrows(IllegalStateException.class, () ->
                 couponService.applyCoupon("UNKNOWN", new BigDecimal("50000"))
+        );
+    }
+
+    @Test
+    void testApplyCouponWithExhaustedQuotaShouldThrow() {
+        Coupon exhausted = new Coupon("EXHAUSTED", "FIXED", new BigDecimal("10000"),
+                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 1);
+        exhausted.setUsedCount(1);
+        repository.save(exhausted);
+
+        assertThrows(IllegalStateException.class, () ->
+                couponService.applyCoupon("EXHAUSTED", new BigDecimal("30000"))
         );
     }
 }
