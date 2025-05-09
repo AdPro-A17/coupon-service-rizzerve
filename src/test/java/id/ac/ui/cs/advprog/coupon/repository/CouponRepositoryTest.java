@@ -43,13 +43,26 @@ public class CouponRepositoryTest {
 
         Coupon updated = new Coupon("UPDATE1", "FIXED", new BigDecimal("10000"),
                 new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 10);
-        repository.save(updated); // overwrite
+        repository.update(updated); // Gunakan method update()
 
         Coupon result = repository.find("UPDATE1");
         assertNotNull(result);
         assertEquals(new BigDecimal("10000"), result.getValue());
         assertEquals(10, result.getQuota());
     }
+
+    @Test
+    void testSaveDuplicateCouponShouldFail() {
+        Coupon first = new Coupon("DUPLICATE", "FIXED", new BigDecimal("5000"),
+                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 5);
+        repository.save(first);
+
+        Coupon second = new Coupon("DUPLICATE", "FIXED", new BigDecimal("10000"),
+                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 10);
+
+        assertThrows(IllegalStateException.class, () -> repository.save(second));
+    }
+
 
     @Test
     void testDeleteCoupon() {
