@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Coupon {
-    private String code;
+    private String code;  // harus UNIK
     private String type; // Misal: "FIXED", "PERCENTAGE"
     private BigDecimal value;
     private BigDecimal minimumPurchase;

@@ -20,6 +20,7 @@ public class CouponService {
     }
 
     public void createCoupon(Coupon coupon) {
+        validateCoupon(coupon);
         repository.save(coupon);
     }
 
@@ -32,6 +33,7 @@ public class CouponService {
     }
 
     public void updateCoupon(Coupon coupon) {
+        validateCoupon(coupon);
         repository.update(coupon);
     }
 
@@ -59,5 +61,23 @@ public class CouponService {
 
     public Collection<Coupon> getAllCoupons() {
         return repository.findAll();
+    }
+
+    private void validateCoupon(Coupon coupon) {
+        if (coupon.getCode() == null || !coupon.getCode().matches("^[a-zA-Z0-9_-]+$")) {
+            throw new IllegalArgumentException("Invalid coupon code format.");
+        }
+        if (coupon.getType() == null || !(coupon.getType().equals("FIXED") || coupon.getType().equals("PERCENTAGE"))) {
+            throw new IllegalArgumentException("Coupon type must be FIXED or PERCENTAGE.");
+        }
+        if (coupon.getValue().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Coupon value must be non-negative.");
+        }
+        if (coupon.getMinimumPurchase().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Minimum purchase must be non-negative.");
+        }
+        if (coupon.getType().equals("PERCENTAGE") && coupon.getValue().compareTo(new BigDecimal("1.0")) > 0) {
+            throw new IllegalArgumentException("Percentage value must not exceed 100%.");
+        }
     }
 }
