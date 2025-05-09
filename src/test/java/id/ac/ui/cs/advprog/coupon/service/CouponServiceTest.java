@@ -75,4 +75,35 @@ public class CouponServiceTest {
         assertEquals(1, updated.getUsedCount());
     }
 
+    @Test
+    void testCreateCouponWithNegativeValueShouldFail() {
+        Coupon badCoupon = new Coupon("BAD", "FIXED", new BigDecimal("-10000"),
+                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 10);
+
+        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
+    }
+
+    @Test
+    void testCreateCouponWithEmptyCodeShouldFail() {
+        Coupon badCoupon = new Coupon("   ", "FIXED", new BigDecimal("10000"),
+                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 10);
+
+        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
+    }
+
+    @Test
+    void testCreateCouponWithQuotaZeroShouldFail() {
+        Coupon badCoupon = new Coupon("ZERO", "FIXED", new BigDecimal("10000"),
+                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 0);
+
+        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
+    }
+
+    @Test
+    void testCreateCouponWithMaliciousCodeShouldFail() {
+        Coupon badCoupon = new Coupon("DROP TABLE", "FIXED", new BigDecimal("10000"),
+                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 5);
+
+        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
+    }
 }

@@ -79,5 +79,7 @@ public class CouponService {
         if (coupon.getType().equals("PERCENTAGE") && coupon.getValue().compareTo(new BigDecimal("1.0")) > 0) {
             throw new IllegalArgumentException("Percentage value must not exceed 100%.");
         }
+
+
     }
 }
