@@ -24,7 +24,10 @@ public class CouponService {
 
         DiscountStrategy strategy = factory.resolve(coupon);
         BigDecimal discounted = strategy.apply(total);
-        coupon.setUsed(true);
+
+        coupon.incrementUsedCount();        // ⬅️ tambahkan pemakaian
+        repository.save(coupon);            // ⬅️ simpan kembali kupon
+
         return discounted;
     }
 }
