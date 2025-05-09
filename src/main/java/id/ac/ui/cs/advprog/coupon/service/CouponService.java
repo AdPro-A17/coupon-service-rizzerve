@@ -4,9 +4,10 @@ import id.ac.ui.cs.advprog.coupon.model.Coupon;
 import id.ac.ui.cs.advprog.coupon.repository.CouponRepository;
 import id.ac.ui.cs.advprog.coupon.strategy.DiscountStrategy;
 import id.ac.ui.cs.advprog.coupon.strategy.DiscountStrategyFactory;
-
+import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
+@Service
 public class CouponService {
     private final CouponRepository repository;
     private final DiscountStrategyFactory factory;
