@@ -1,1 +1,13 @@
-[![Quality Gate Status](https://sonarqube.cs.ui.ac.id/api/project_badges/measure?project=coupon-service-rizzerve&metric=alert_status&token=sqb_df390da07570f8cdbe48075f7629ef87509c27cb)](https://sonarqube.cs.ui.ac.id/dashboard?id=coupon-service-rizzerve)
+# Diagram A17 - Rizzerve
+- Context Diagram
+  ![Context Diagram](images/rizzerve-a17-context-diagram.png)
+
+- Container Diagram
+  ![Container Diagram](images/rizzerve-a17-diagrams-container-diagram.png)
+
+- Deployment Diagram
+  ![Deployment Diagram](images/rizzerve-a17-deployment-diagrams-diagram.png)
+
+---
+
+# Individual (Fadhlurohman Dzaki - 2306202132)
