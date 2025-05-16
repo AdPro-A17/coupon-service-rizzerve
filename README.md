@@ -8,6 +8,9 @@
 - Deployment Diagram
   ![Deployment Diagram](images/rizzerve-a17-deployment-diagrams-diagram.png)
 
+future architecture
+![Deployment Diagram](images/messageImage_1747403707040.png)
+
 ---
 
 # Individual (Fadhlurohman Dzaki - 2306202132)
