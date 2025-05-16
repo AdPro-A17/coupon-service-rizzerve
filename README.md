@@ -11,3 +11,7 @@
 ---
 
 # Individual (Fadhlurohman Dzaki - 2306202132)
+- component 
+![Deployment Diagram](images/rizzerve-a17-component-diagrams-diagram.png)
+- code
+![Deployment Diagram](images/coupon.png)
