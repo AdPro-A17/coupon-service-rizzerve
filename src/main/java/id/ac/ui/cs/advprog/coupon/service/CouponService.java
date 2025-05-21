@@ -11,7 +11,7 @@ import java.util.Collection;
 
 @Service
 public class CouponService {
-    private final CouponRepository repository;
+    private final CouponRepository repository; // sekarang JpaRepository
     private final DiscountStrategyFactory factory;
 
     public CouponService(CouponRepository repository, DiscountStrategyFactory factory) {
@@ -21,27 +21,30 @@ public class CouponService {
 
     public void createCoupon(Coupon coupon) {
         validateCoupon(coupon);
+        if (repository.existsById(coupon.getCode())) {
+            throw new IllegalStateException("Coupon already exists: " + coupon.getCode());
+        }
         repository.save(coupon);
     }
 
     public Coupon getCoupon(String code) {
-        Coupon coupon = repository.find(code);
-        if (coupon == null) {
-            throw new IllegalStateException("Coupon not found: " + code);
-        }
-        return coupon;
+        return repository.findById(code)
+                .orElseThrow(() -> new IllegalStateException("Coupon not found: " + code));
     }
 
     public void updateCoupon(Coupon coupon) {
+        if (!repository.existsById(coupon.getCode())) {
+            throw new IllegalStateException("Cannot update non-existing coupon: " + coupon.getCode());
+        }
         validateCoupon(coupon);
-        repository.update(coupon);
+        repository.save(coupon);
     }
 
     public void deleteCoupon(String code) {
-        if (repository.find(code) == null) {
+        if (!repository.existsById(code)) {
             throw new IllegalStateException("Coupon not found: " + code);
         }
-        repository.delete(code);
+        repository.deleteById(code);
     }
 
     public BigDecimal applyCoupon(String code, BigDecimal total) {
@@ -50,12 +53,9 @@ public class CouponService {
             throw new IllegalStateException("Invalid, expired, or insufficient purchase");
         }
 
-        DiscountStrategy strategy = factory.resolve(coupon);
-        BigDecimal discounted = strategy.apply(total);
-
+        BigDecimal discounted = factory.resolve(coupon).apply(total);
         coupon.incrementUsedCount();
-        repository.update(coupon);
-
+        repository.save(coupon); // update in DB
         return discounted;
     }
 

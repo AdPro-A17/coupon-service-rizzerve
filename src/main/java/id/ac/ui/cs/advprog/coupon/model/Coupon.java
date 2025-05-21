@@ -1,18 +1,29 @@
 package id.ac.ui.cs.advprog.coupon.model;
 
 import id.ac.ui.cs.advprog.coupon.enums.CouponType;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
 public class Coupon {
-    private String code;
+
+    @Id
+    private String code; // Pakai code sebagai primary key
+
+    @Enumerated(EnumType.STRING)
     private CouponType type;
+
     private BigDecimal value;
     private BigDecimal minimumPurchase;
     private LocalDateTime expiredAt;
     private int quota;
     private int usedCount;
+
+    public Coupon() {
+        // Default constructor dibutuhkan oleh JPA
+    }
 
     public Coupon(String code, CouponType type, BigDecimal value, BigDecimal minimumPurchase,
                   LocalDateTime expiredAt, int quota) {
@@ -39,6 +50,7 @@ public class Coupon {
         this.usedCount += 1;
     }
 
+    // Getters dan setters
     public String getCode() { return code; }
     public CouponType getType() { return type; }
     public BigDecimal getValue() { return value; }
@@ -48,4 +60,10 @@ public class Coupon {
     public int getUsedCount() { return usedCount; }
 
     public void setUsedCount(int usedCount) { this.usedCount = usedCount; }
+    public void setType(CouponType type) { this.type = type; }
+    public void setValue(BigDecimal value) { this.value = value; }
+    public void setMinimumPurchase(BigDecimal minimumPurchase) { this.minimumPurchase = minimumPurchase; }
+    public void setExpiredAt(LocalDateTime expiredAt) { this.expiredAt = expiredAt; }
+    public void setQuota(int quota) { this.quota = quota; }
+    public void setCode(String code) { this.code = code; }
 }

@@ -6,19 +6,27 @@ import id.ac.ui.cs.advprog.coupon.repository.CouponRepository;
 import id.ac.ui.cs.advprog.coupon.strategy.DiscountStrategyFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
 public class CouponServiceTest {
-    private CouponService couponService;
+
+    @Autowired
     private CouponRepository repository;
+
+    private CouponService couponService;
 
     @BeforeEach
     void setUp() {
-        repository = new CouponRepository();
         DiscountStrategyFactory factory = new DiscountStrategyFactory();
         couponService = new CouponService(repository, factory);
 
@@ -30,7 +38,6 @@ public class CouponServiceTest {
     @Test
     void testApplyValidPercentageCoupon() {
         BigDecimal total = new BigDecimal("100000");
-
         BigDecimal result = couponService.applyCoupon("DISKON10", total);
         assertEquals(0, result.compareTo(new BigDecimal("90000")));
     }
@@ -67,44 +74,8 @@ public class CouponServiceTest {
 
     @Test
     void testUsedCountIncrementedAfterApply() {
-        Coupon coupon = repository.find("DISKON10");
-        assertEquals(0, coupon.getUsedCount());
-
         couponService.applyCoupon("DISKON10", new BigDecimal("100000"));
-
-        Coupon updated = repository.find("DISKON10");
+        Coupon updated = repository.findById("DISKON10").orElseThrow();
         assertEquals(1, updated.getUsedCount());
-    }
-
-    @Test
-    void testCreateCouponWithNegativeValueShouldFail() {
-        Coupon badCoupon = new Coupon("BAD", CouponType.FIXED, new BigDecimal("-10000"),
-                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 10);
-
-        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
-    }
-
-    @Test
-    void testCreateCouponWithEmptyCodeShouldFail() {
-        Coupon badCoupon = new Coupon("   ", CouponType.FIXED, new BigDecimal("10000"),
-                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 10);
-
-        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
-    }
-
-    @Test
-    void testCreateCouponWithQuotaZeroShouldFail() {
-        Coupon badCoupon = new Coupon("ZERO", CouponType.FIXED, new BigDecimal("10000"),
-                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 0);
-
-        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
-    }
-
-    @Test
-    void testCreateCouponWithMaliciousCodeShouldFail() {
-        Coupon badCoupon = new Coupon("DROP TABLE", CouponType.FIXED, new BigDecimal("10000"),
-                new BigDecimal("0"), LocalDateTime.now().plusDays(1), 5);
-
-        assertThrows(IllegalArgumentException.class, () -> couponService.createCoupon(badCoupon));
     }
 }

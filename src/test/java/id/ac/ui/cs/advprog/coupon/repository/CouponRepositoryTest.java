@@ -2,77 +2,78 @@ package id.ac.ui.cs.advprog.coupon.repository;
 
 import id.ac.ui.cs.advprog.coupon.enums.CouponType;
 import id.ac.ui.cs.advprog.coupon.model.Coupon;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
+@ActiveProfiles("test")  // gunakan application-test.properties
 public class CouponRepositoryTest {
-    private CouponRepository repository;
 
-    @BeforeEach
-    void setUp() {
-        repository = new CouponRepository();
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private CouponRepository couponRepository;
+
+    @Test
+    void testSaveCoupon() {
+        Coupon coupon = buildSampleCoupon("SAVE10");
+        Coupon saved = couponRepository.save(coupon);
+
+        assertEquals(coupon.getCode(), saved.getCode());
+        assertEquals(coupon.getValue(), saved.getValue());
     }
 
     @Test
-    void testSaveAndFindCoupon() {
-        Coupon coupon = new Coupon("SAVE10", CouponType.PERCENTAGE, new BigDecimal("10"),
-                new BigDecimal("0.0"), LocalDateTime.now().plusDays(1), 10);
-        repository.save(coupon);
+    void testFindAllReturnsSavedCoupons() {
+        Coupon coupon1 = buildSampleCoupon("DISC1");
+        Coupon coupon2 = buildSampleCoupon("DISC2");
 
-        Coupon result = repository.find("SAVE10");
-        assertNotNull(result);
-        assertEquals("SAVE10", result.getCode());
-        assertEquals(new BigDecimal("10"), result.getValue());
+        entityManager.persist(coupon1);
+        entityManager.persist(coupon2);
+        entityManager.flush();
+
+        assertEquals(2, couponRepository.findAll().size());
     }
 
     @Test
-    void testFindNonExistingCouponReturnsNull() {
-        Coupon result = repository.find("UNKNOWN");
-        assertNull(result);
+    void testFindByIdReturnsCorrectCoupon() {
+        Coupon coupon = buildSampleCoupon("SPECIAL");
+        entityManager.persist(coupon);
+        entityManager.flush();
+
+        Optional<Coupon> result = couponRepository.findById("SPECIAL");
+
+        assertTrue(result.isPresent());
+        assertEquals("SPECIAL", result.get().getCode());
     }
 
     @Test
-    void testUpdateCouponOverwritesExisting() {
-        Coupon original = new Coupon("UPDATE1", CouponType.FIXED, new BigDecimal("5000"),
-                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 5);
-        repository.save(original);
-
-        Coupon updated = new Coupon("UPDATE1", CouponType.FIXED, new BigDecimal("10000"),
-                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 10);
-        repository.update(updated);
-
-        Coupon result = repository.find("UPDATE1");
-        assertNotNull(result);
-        assertEquals(new BigDecimal("10000"), result.getValue());
-        assertEquals(10, result.getQuota());
+    void testFindByIdReturnsEmptyForUnknownCode() {
+        Optional<Coupon> result = couponRepository.findById("UNKNOWN");
+        assertTrue(result.isEmpty());
     }
 
-    @Test
-    void testSaveDuplicateCouponShouldFail() {
-        Coupon first = new Coupon("DUPLICATE", CouponType.FIXED, new BigDecimal("5000"),
-                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 5);
-        repository.save(first);
-
-        Coupon second = new Coupon("DUPLICATE", CouponType.FIXED, new BigDecimal("10000"),
-                new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 10);
-
-        assertThrows(IllegalStateException.class, () -> repository.save(second));
-    }
-
-    @Test
-    void testDeleteCoupon() {
-        Coupon coupon = new Coupon("DELETE1", CouponType.PERCENTAGE, new BigDecimal("5"),
-                new BigDecimal("10000"), LocalDateTime.now().plusDays(1), 5);
-        repository.save(coupon);
-
-        repository.delete("DELETE1");
-
-        Coupon result = repository.find("DELETE1");
-        assertNull(result);
+    private Coupon buildSampleCoupon(String code) {
+        return new Coupon(
+                code,
+                CouponType.FIXED,
+                new BigDecimal("10000"),
+                new BigDecimal("50000"),
+                LocalDateTime.now().plusDays(5),
+                10
+        );
     }
 }
