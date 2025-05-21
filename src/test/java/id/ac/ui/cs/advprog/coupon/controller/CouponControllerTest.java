@@ -1,6 +1,8 @@
 package id.ac.ui.cs.advprog.coupon.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import id.ac.ui.cs.advprog.coupon.dto.CouponRequest;
+import id.ac.ui.cs.advprog.coupon.enums.CouponType;
 import id.ac.ui.cs.advprog.coupon.model.Coupon;
 import id.ac.ui.cs.advprog.coupon.repository.CouponRepository;
 import id.ac.ui.cs.advprog.coupon.service.CouponService;
@@ -38,15 +40,15 @@ public class CouponControllerTest {
 
     @BeforeEach
     void setUp() {
-        coupon = new Coupon("TEST", "FIXED", new BigDecimal("10000"),
+        coupon = new Coupon("TEST", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("50000"), LocalDateTime.now().plusDays(1), 5);
     }
 
     @Test
     void testCreateCoupon() throws Exception {
-        CouponController.CouponRequest request = new CouponController.CouponRequest();
+        CouponRequest request = new CouponRequest();
         request.setCode("TEST");
-        request.setType("FIXED");
+        request.setType(CouponType.FIXED);
         request.setValue(new BigDecimal("10000"));
         request.setMinimumPurchase(new BigDecimal("50000"));
         request.setExpiredAt(LocalDateTime.now().plusDays(1));
@@ -62,7 +64,7 @@ public class CouponControllerTest {
 
     @Test
     void testGetCoupon() throws Exception {
-        Coupon coupon = new Coupon("TEST", "FIXED", new BigDecimal("10000"),
+        Coupon coupon = new Coupon("TEST", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("50000"), LocalDateTime.now().plusDays(1), 10);
         coupon.setUsedCount(0);
 
@@ -74,14 +76,13 @@ public class CouponControllerTest {
                 .andExpect(jsonPath("$.type").value("FIXED"));
     }
 
-
     @Test
     void testUpdateCoupon() throws Exception {
         when(couponRepository.find("TEST")).thenReturn(coupon);
 
-        CouponController.CouponRequest request = new CouponController.CouponRequest();
+        CouponRequest request = new CouponRequest();
         request.setCode("TEST");
-        request.setType("FIXED");
+        request.setType(CouponType.FIXED);
         request.setValue(new BigDecimal("15000"));
         request.setMinimumPurchase(new BigDecimal("50000"));
         request.setExpiredAt(LocalDateTime.now().plusDays(1));

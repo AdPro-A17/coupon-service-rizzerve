@@ -1,18 +1,20 @@
 package id.ac.ui.cs.advprog.coupon.model;
 
+import id.ac.ui.cs.advprog.coupon.enums.CouponType;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Coupon {
-    private String code;  // harus UNIK
-    private String type; // Misal: "FIXED", "PERCENTAGE"
+    private String code;
+    private CouponType type;
     private BigDecimal value;
     private BigDecimal minimumPurchase;
     private LocalDateTime expiredAt;
-    private int quota; // Jumlah maksimum pemakaian
-    private int usedCount; // Jumlah pemakaian saat ini
+    private int quota;
+    private int usedCount;
 
-    public Coupon(String code, String type, BigDecimal value, BigDecimal minimumPurchase,
+    public Coupon(String code, CouponType type, BigDecimal value, BigDecimal minimumPurchase,
                   LocalDateTime expiredAt, int quota) {
         this.code = code;
         this.type = type;
@@ -37,16 +39,13 @@ public class Coupon {
         this.usedCount += 1;
     }
 
-    // Getters
     public String getCode() { return code; }
-    public String getType() { return type; }
+    public CouponType getType() { return type; }
     public BigDecimal getValue() { return value; }
     public BigDecimal getMinimumPurchase() { return minimumPurchase; }
     public LocalDateTime getExpiredAt() { return expiredAt; }
     public int getQuota() { return quota; }
     public int getUsedCount() { return usedCount; }
 
-    // Setters
-    public void setQuota(int quota) { this.quota = quota; }
     public void setUsedCount(int usedCount) { this.usedCount = usedCount; }
 }

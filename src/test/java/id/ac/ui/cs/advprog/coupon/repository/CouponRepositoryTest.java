@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.coupon.repository;
 
+import id.ac.ui.cs.advprog.coupon.enums.CouponType;
 import id.ac.ui.cs.advprog.coupon.model.Coupon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ public class CouponRepositoryTest {
 
     @Test
     void testSaveAndFindCoupon() {
-        Coupon coupon = new Coupon("SAVE10", "PERCENTAGE", new BigDecimal("10"),
+        Coupon coupon = new Coupon("SAVE10", CouponType.PERCENTAGE, new BigDecimal("10"),
                 new BigDecimal("0.0"), LocalDateTime.now().plusDays(1), 10);
         repository.save(coupon);
 
@@ -37,13 +38,13 @@ public class CouponRepositoryTest {
 
     @Test
     void testUpdateCouponOverwritesExisting() {
-        Coupon original = new Coupon("UPDATE1", "FIXED", new BigDecimal("5000"),
+        Coupon original = new Coupon("UPDATE1", CouponType.FIXED, new BigDecimal("5000"),
                 new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 5);
         repository.save(original);
 
-        Coupon updated = new Coupon("UPDATE1", "FIXED", new BigDecimal("10000"),
+        Coupon updated = new Coupon("UPDATE1", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 10);
-        repository.update(updated); // Gunakan method update()
+        repository.update(updated);
 
         Coupon result = repository.find("UPDATE1");
         assertNotNull(result);
@@ -53,24 +54,22 @@ public class CouponRepositoryTest {
 
     @Test
     void testSaveDuplicateCouponShouldFail() {
-        Coupon first = new Coupon("DUPLICATE", "FIXED", new BigDecimal("5000"),
+        Coupon first = new Coupon("DUPLICATE", CouponType.FIXED, new BigDecimal("5000"),
                 new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 5);
         repository.save(first);
 
-        Coupon second = new Coupon("DUPLICATE", "FIXED", new BigDecimal("10000"),
+        Coupon second = new Coupon("DUPLICATE", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("20000"), LocalDateTime.now().plusDays(1), 10);
 
         assertThrows(IllegalStateException.class, () -> repository.save(second));
     }
 
-
     @Test
     void testDeleteCoupon() {
-        Coupon coupon = new Coupon("DELETE1", "PERCENTAGE", new BigDecimal("5"),
+        Coupon coupon = new Coupon("DELETE1", CouponType.PERCENTAGE, new BigDecimal("5"),
                 new BigDecimal("10000"), LocalDateTime.now().plusDays(1), 5);
         repository.save(coupon);
 
-        // Simulasi delete manual
         repository.delete("DELETE1");
 
         Coupon result = repository.find("DELETE1");

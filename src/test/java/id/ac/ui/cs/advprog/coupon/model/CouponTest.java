@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.coupon.model;
 
+import id.ac.ui.cs.advprog.coupon.enums.CouponType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ public class CouponTest {
 
     @Test
     void testCouponNotUsableWhenBelowMinimumPurchase() {
-        Coupon coupon = new Coupon("MIN50K", "FIXED", new BigDecimal("10000"),
+        Coupon coupon = new Coupon("MIN50K", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("50000"), LocalDateTime.now().plusDays(1), 5);
         BigDecimal total = new BigDecimal("40000");
 
@@ -20,7 +21,7 @@ public class CouponTest {
 
     @Test
     void testCouponUsableWhenTotalMeetsMinimumPurchaseAndQuota() {
-        Coupon coupon = new Coupon("OK", "FIXED", new BigDecimal("10000"),
+        Coupon coupon = new Coupon("OK", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("30000"), LocalDateTime.now().plusDays(1), 5);
         BigDecimal total = new BigDecimal("30000");
 
@@ -29,7 +30,7 @@ public class CouponTest {
 
     @Test
     void testCouponNotUsableWhenQuotaExceeded() {
-        Coupon coupon = new Coupon("LIMIT", "FIXED", new BigDecimal("10000"),
+        Coupon coupon = new Coupon("LIMIT", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("10000"), LocalDateTime.now().plusDays(1), 2);
         coupon.setUsedCount(2); // quota sudah habis
 
@@ -38,7 +39,7 @@ public class CouponTest {
 
     @Test
     void testCouponNotExpired() {
-        Coupon coupon = new Coupon("TEST", "PERCENTAGE", new BigDecimal("10"),
+        Coupon coupon = new Coupon("TEST", CouponType.PERCENTAGE, new BigDecimal("10"),
                 new BigDecimal("0.0"), LocalDateTime.now().plusDays(1), 5);
         assertFalse(coupon.isExpired());
         assertTrue(coupon.isUsable(new BigDecimal("100")));

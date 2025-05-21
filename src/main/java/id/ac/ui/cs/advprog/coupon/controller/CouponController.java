@@ -1,5 +1,7 @@
 package id.ac.ui.cs.advprog.coupon.controller;
 
+import id.ac.ui.cs.advprog.coupon.dto.CouponRequest;
+import id.ac.ui.cs.advprog.coupon.enums.CouponType;
 import id.ac.ui.cs.advprog.coupon.model.Coupon;
 import id.ac.ui.cs.advprog.coupon.service.CouponService;
 import org.springframework.http.HttpStatus;
@@ -7,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 @RestController
@@ -77,9 +78,14 @@ public class CouponController {
     }
 
     private Coupon toCoupon(CouponRequest request) {
+        CouponType couponType = request.getType();
+        if (couponType == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coupon type is required and must be valid (e.g. FIXED, PERCENTAGE)");
+        }
+
         Coupon coupon = new Coupon(
                 request.getCode(),
-                request.getType(),
+                couponType,
                 request.getValue(),
                 request.getMinimumPurchase(),
                 request.getExpiredAt(),
@@ -87,37 +93,5 @@ public class CouponController {
         );
         coupon.setUsedCount(request.getUsedCount());
         return coupon;
-    }
-
-    public static class CouponRequest {
-        private String code;
-        private String type;
-        private BigDecimal value;
-        private BigDecimal minimumPurchase;
-        private LocalDateTime expiredAt;
-        private int quota;
-        private int usedCount;
-
-        // Getters & Setters
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-
-        public String getType() { return type; }
-        public void setType(String type) { this.type = type; }
-
-        public BigDecimal getValue() { return value; }
-        public void setValue(BigDecimal value) { this.value = value; }
-
-        public BigDecimal getMinimumPurchase() { return minimumPurchase; }
-        public void setMinimumPurchase(BigDecimal minimumPurchase) { this.minimumPurchase = minimumPurchase; }
-
-        public LocalDateTime getExpiredAt() { return expiredAt; }
-        public void setExpiredAt(LocalDateTime expiredAt) { this.expiredAt = expiredAt; }
-
-        public int getQuota() { return quota; }
-        public void setQuota(int quota) { this.quota = quota; }
-
-        public int getUsedCount() { return usedCount; }
-        public void setUsedCount(int usedCount) { this.usedCount = usedCount; }
     }
 }

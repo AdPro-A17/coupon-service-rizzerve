@@ -67,9 +67,10 @@ public class CouponService {
         if (coupon.getCode() == null || !coupon.getCode().matches("^[a-zA-Z0-9_-]+$")) {
             throw new IllegalArgumentException("Invalid coupon code format.");
         }
-        if (coupon.getType() == null || !(coupon.getType().equals("FIXED") || coupon.getType().equals("PERCENTAGE"))) {
+        if (coupon.getType() == null) {
             throw new IllegalArgumentException("Coupon type must be FIXED or PERCENTAGE.");
         }
+
         if (coupon.getValue().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Coupon value must be non-negative.");
         }
