@@ -32,13 +32,29 @@ public class CouponService {
                 .orElseThrow(() -> new IllegalStateException("Coupon not found: " + code));
     }
 
-    public void updateCoupon(Coupon coupon) {
-        if (!repository.existsById(coupon.getCode())) {
-            throw new IllegalStateException("Cannot update non-existing coupon: " + coupon.getCode());
+    public void updateCoupon(Coupon incomingCoupon) {
+        Coupon existingCoupon = repository.findById(incomingCoupon.getCode())
+                .orElseThrow(() -> new IllegalStateException("Cannot update non-existing coupon: " + incomingCoupon.getCode()));
+
+        // Hanya izinkan perubahan pada quota
+        if (!incomingCoupon.getType().equals(existingCoupon.getType()) ||
+                incomingCoupon.getValue().compareTo(existingCoupon.getValue()) != 0 ||
+                incomingCoupon.getMinimumPurchase().compareTo(existingCoupon.getMinimumPurchase()) != 0 ||
+                !incomingCoupon.getExpiredAt().equals(existingCoupon.getExpiredAt()) ||
+                incomingCoupon.getUsedCount() != existingCoupon.getUsedCount()) {
+            throw new IllegalStateException("Only quota can be updated");
         }
-        validateCoupon(coupon);
-        repository.save(coupon);
+
+        // Validasi quota baru
+        if (incomingCoupon.getQuota() < existingCoupon.getUsedCount()) {
+            throw new IllegalStateException("Quota cannot be less than used count");
+        }
+
+        // Update hanya field quota
+        existingCoupon.setQuota(incomingCoupon.getQuota());
+        repository.save(existingCoupon);
     }
+
 
     public void deleteCoupon(String code) {
         if (!repository.existsById(code)) {

@@ -78,4 +78,54 @@ public class CouponServiceTest {
         Coupon updated = repository.findById("DISKON10").orElseThrow();
         assertEquals(1, updated.getUsedCount());
     }
+
+    @Test
+    void testUpdateCouponQuotaSuccessfully() {
+        Coupon original = repository.findById("DISKON10").orElseThrow();
+        assertEquals(5, original.getQuota());
+
+        Coupon updated = new Coupon("DISKON10", original.getType(), original.getValue(),
+                original.getMinimumPurchase(), original.getExpiredAt(), 10);
+        updated.setUsedCount(original.getUsedCount());
+
+        couponService.updateCoupon(updated);
+
+        Coupon afterUpdate = repository.findById("DISKON10").orElseThrow();
+        assertEquals(10, afterUpdate.getQuota());
+        assertEquals(original.getType(), afterUpdate.getType());
+        assertEquals(original.getValue(), afterUpdate.getValue());
+    }
+
+    @Test
+    void testUpdateCouponWithDifferentValueShouldThrow() {
+        Coupon original = repository.findById("DISKON10").orElseThrow();
+
+        Coupon invalidUpdate = new Coupon("DISKON10", original.getType(), new BigDecimal("20"),
+                original.getMinimumPurchase(), original.getExpiredAt(), 10);
+        invalidUpdate.setUsedCount(original.getUsedCount());
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            couponService.updateCoupon(invalidUpdate);
+        });
+
+        assertEquals("Only quota can be updated", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateCouponWithLowerQuotaThanUsedCountShouldThrow() {
+        Coupon original = repository.findById("DISKON10").orElseThrow();
+        original.setUsedCount(4);
+        repository.save(original);
+
+        Coupon update = new Coupon("DISKON10", original.getType(), original.getValue(),
+                original.getMinimumPurchase(), original.getExpiredAt(), 2);
+        update.setUsedCount(4); // simulasikan already-used
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            couponService.updateCoupon(update);
+        });
+
+        assertEquals("Quota cannot be less than used count", exception.getMessage());
+    }
+
 }
