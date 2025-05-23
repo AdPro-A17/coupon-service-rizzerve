@@ -2,9 +2,10 @@ package id.ac.ui.cs.advprog.coupon.service;
 
 import id.ac.ui.cs.advprog.coupon.model.Coupon;
 import id.ac.ui.cs.advprog.coupon.repository.CouponRepository;
-import id.ac.ui.cs.advprog.coupon.strategy.DiscountStrategy;
 import id.ac.ui.cs.advprog.coupon.strategy.DiscountStrategyFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
+import java.util.concurrent.CompletableFuture;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -19,17 +20,21 @@ public class CouponService {
         this.factory = factory;
     }
 
-    public void createCoupon(Coupon coupon) {
+    @Async
+    public CompletableFuture<String> createCoupon(Coupon coupon) {
         validateCoupon(coupon);
         if (repository.existsById(coupon.getCode())) {
             throw new IllegalStateException("Coupon already exists: " + coupon.getCode());
         }
         repository.save(coupon);
+        return CompletableFuture.completedFuture("Coupon created successfully");
     }
 
-    public Coupon getCoupon(String code) {
-        return repository.findById(code)
-                .orElseThrow(() -> new IllegalStateException("Coupon not found: " + code));
+    @Async
+    public CompletableFuture<Coupon> getCoupon(String code) {
+        return CompletableFuture.supplyAsync(() ->
+                repository.findById(code)
+                        .orElseThrow(() -> new IllegalStateException("Coupon not found: " + code)));
     }
 
     public void updateCoupon(Coupon incomingCoupon) {
@@ -56,6 +61,7 @@ public class CouponService {
     }
 
 
+
     public void deleteCoupon(String code) {
         if (!repository.existsById(code)) {
             throw new IllegalStateException("Coupon not found: " + code);
@@ -63,20 +69,22 @@ public class CouponService {
         repository.deleteById(code);
     }
 
-    public BigDecimal applyCoupon(String code, BigDecimal total) {
-        Coupon coupon = getCoupon(code);
-        if (!coupon.isUsable(total)) {
-            throw new IllegalStateException("Invalid, expired, or insufficient purchase");
-        }
-
-        BigDecimal discounted = factory.resolve(coupon).apply(total);
-        coupon.incrementUsedCount();
-        repository.save(coupon); // update in DB
-        return discounted;
+    @Async
+    public CompletableFuture<BigDecimal> applyCoupon(String code, BigDecimal total) {
+        return getCoupon(code).thenApply(coupon -> {
+            if (!coupon.isUsable(total)) {
+                throw new IllegalStateException("Invalid, expired, or insufficient purchase");
+            }
+            BigDecimal discounted = factory.resolve(coupon).apply(total);
+            coupon.incrementUsedCount();
+            repository.save(coupon);
+            return discounted;
+        });
     }
 
-    public Collection<Coupon> getAllCoupons() {
-        return repository.findAll();
+    @Async
+    public CompletableFuture<Collection<Coupon>> getAllCoupons() {
+        return CompletableFuture.supplyAsync(() -> repository.findAll());
     }
 
     private void validateCoupon(Coupon coupon) {

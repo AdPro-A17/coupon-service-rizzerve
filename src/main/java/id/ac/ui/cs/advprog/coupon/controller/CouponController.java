@@ -7,6 +7,7 @@ import id.ac.ui.cs.advprog.coupon.service.CouponService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.concurrent.CompletableFuture;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -22,22 +23,13 @@ public class CouponController {
     }
 
     @PostMapping
-    public String createCoupon(@RequestBody CouponRequest request) {
-        try {
-            couponService.createCoupon(toCoupon(request));
-            return "Coupon created successfully";
-        } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        }
+    public CompletableFuture<String> createCoupon(@RequestBody CouponRequest request) {
+        return couponService.createCoupon(toCoupon(request));
     }
 
     @GetMapping("/{code}")
-    public Coupon getCoupon(@PathVariable String code) {
-        try {
-            return couponService.getCoupon(code);
-        } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
+    public CompletableFuture<Coupon> getCoupon(@PathVariable String code) {
+        return couponService.getCoupon(code);
     }
 
     @PutMapping("/{code}")
@@ -64,17 +56,13 @@ public class CouponController {
     }
 
     @GetMapping
-    public Collection<Coupon> listCoupons() {
+    public CompletableFuture<Collection<Coupon>> listCoupons() {
         return couponService.getAllCoupons();
     }
 
     @PostMapping("/{code}/apply")
-    public BigDecimal applyCoupon(@PathVariable String code, @RequestParam BigDecimal total) {
-        try {
-            return couponService.applyCoupon(code, total);
-        } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+    public CompletableFuture<BigDecimal> applyCoupon(@PathVariable String code, @RequestParam BigDecimal total) {
+        return couponService.applyCoupon(code, total);
     }
 
     private Coupon toCoupon(CouponRequest request) {
