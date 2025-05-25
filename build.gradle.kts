@@ -82,4 +82,9 @@ tasks.test {
 
 tasks.jacocoTestReport {
 	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)     // wajib untuk sonar
+		csv.required.set(false)
+		html.required.set(false)   // opsional
+	}
 }
