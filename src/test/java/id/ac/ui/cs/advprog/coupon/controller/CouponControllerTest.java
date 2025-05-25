@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -42,6 +44,7 @@ public class CouponControllerTest {
     void setUp() {
         coupon = new Coupon("TEST", CouponType.FIXED, new BigDecimal("10000"),
                 new BigDecimal("50000"), LocalDateTime.now().plusDays(1), 5);
+        coupon.setUsedCount(0);
     }
 
     @Test
@@ -55,6 +58,9 @@ public class CouponControllerTest {
         request.setQuota(5);
         request.setUsedCount(0);
 
+        when(couponService.createCoupon(any(Coupon.class)))
+                .thenReturn(CompletableFuture.completedFuture("Coupon created successfully"));
+
         mockMvc.perform(post("/coupon")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -64,11 +70,8 @@ public class CouponControllerTest {
 
     @Test
     void testGetCoupon() throws Exception {
-        Coupon coupon = new Coupon("TEST", CouponType.FIXED, new BigDecimal("10000"),
-                new BigDecimal("50000"), LocalDateTime.now().plusDays(1), 10);
-        coupon.setUsedCount(0);
-
-        when(couponService.getCoupon("TEST")).thenReturn(coupon);
+        when(couponService.getCoupon("TEST"))
+                .thenReturn(CompletableFuture.completedFuture(coupon));
 
         mockMvc.perform(get("/coupon/TEST"))
                 .andExpect(status().isOk())
@@ -78,7 +81,8 @@ public class CouponControllerTest {
 
     @Test
     void testUpdateCoupon() throws Exception {
-        when(couponRepository.find("TEST")).thenReturn(coupon);
+        when(couponRepository.findById("TEST"))
+                .thenReturn(Optional.of(coupon));
 
         CouponRequest request = new CouponRequest();
         request.setCode("TEST");
@@ -89,6 +93,8 @@ public class CouponControllerTest {
         request.setQuota(10);
         request.setUsedCount(2);
 
+        doNothing().when(couponService).updateCoupon(any(Coupon.class));
+
         mockMvc.perform(put("/coupon/TEST")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -98,8 +104,9 @@ public class CouponControllerTest {
 
     @Test
     void testDeleteCoupon() throws Exception {
-        when(couponRepository.find("TEST")).thenReturn(coupon);
-        doNothing().when(couponRepository).delete("TEST");
+        when(couponRepository.findById("TEST"))
+                .thenReturn(Optional.of(coupon));
+        doNothing().when(couponService).deleteCoupon("TEST");
 
         mockMvc.perform(delete("/coupon/TEST"))
                 .andExpect(status().isOk())
@@ -109,7 +116,7 @@ public class CouponControllerTest {
     @Test
     void testApplyCoupon() throws Exception {
         when(couponService.applyCoupon("TEST", new BigDecimal("100000")))
-                .thenReturn(new BigDecimal("90000"));
+                .thenReturn(CompletableFuture.completedFuture(new BigDecimal("90000")));
 
         mockMvc.perform(post("/coupon/TEST/apply")
                         .param("total", "100000"))
