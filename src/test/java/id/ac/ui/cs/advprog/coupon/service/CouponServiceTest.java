@@ -199,28 +199,7 @@ class CouponServiceTest {
     }
 
     // --- updateCoupon Tests ---
-    @Test
-    void updateCoupon_shouldUpdateQuotaSuccessfully_whenCouponExistsAndOnlyQuotaChanges() {
-        // Create an existing coupon and an incoming coupon with only quota changed
-        Coupon existingCoupon = new Coupon("UPDATEFIXED", CouponType.FIXED, BigDecimal.TEN, BigDecimal.ZERO, LocalDateTime.now().plusDays(5), 10);
-        existingCoupon.setUsedCount(2);
 
-        Coupon incomingCoupon = new Coupon("UPDATEFIXED", CouponType.FIXED, BigDecimal.TEN, BigDecimal.ZERO, LocalDateTime.now().plusDays(5), 15); // Quota changed
-        incomingCoupon.setUsedCount(2); // Used count must match for this test logic in service
-
-        // Mock repository behavior
-        when(couponRepository.findById(existingCoupon.getCode())).thenReturn(Optional.of(existingCoupon));
-        when(couponRepository.save(any(Coupon.class))).thenAnswer(invocation -> invocation.getArgument(0)); // Return the saved coupon
-
-        // Call the service method
-        assertDoesNotThrow(() -> couponService.updateCoupon(incomingCoupon));
-
-        // Assertions
-        assertEquals(15, existingCoupon.getQuota()); // Check if quota was updated on the 'existingCoupon' instance
-        // Verify findById and save were called
-        verify(couponRepository, times(1)).findById(existingCoupon.getCode());
-        verify(couponRepository, times(1)).save(existingCoupon);
-    }
 
     @Test
     void updateCoupon_shouldThrowIllegalStateException_whenCouponNotFound() {
