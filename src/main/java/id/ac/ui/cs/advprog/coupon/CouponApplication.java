@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class CouponApplication {
 
 	public static void main(String[] args) {
-		// Load .env file before Spring Boot starts
+		 //Load .env file before Spring Boot starts
 		try {
 			Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 			dotenv.entries().forEach(e -> {
