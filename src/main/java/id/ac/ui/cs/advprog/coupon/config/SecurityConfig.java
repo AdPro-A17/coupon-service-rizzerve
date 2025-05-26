@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("GET", "/coupon", "/coupon/**").permitAll()
                         .requestMatchers("POST", "/coupon/*/apply").permitAll()
                         // Others require auth
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
