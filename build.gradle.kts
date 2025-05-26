@@ -11,9 +11,14 @@ sonar {
 		property("sonar.projectKey", "coupon-service-rizzerve")
 		property("sonar.projectName", "coupon-service-rizzerve")
 		property("sonar.host.url", "https://sonarqube.cs.ui.ac.id")
+		property("sonar.login", System.getenv("SONAR_TOKEN"))
+
 	}
 }
 
+// Version variables
+val jjwtVersion = "0.11.5"
+val dotenvVersion = "2.3.2"
 
 group = "id.ac.ui.cs.advprog"
 version = "0.0.1-SNAPSHOT"
@@ -84,5 +89,16 @@ tasks.test {
 
 tasks.jacocoTestReport {
 	dependsOn(tasks.test)
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
 
+tasks.withType<Test> {
+	useJUnitPlatform()
+}
+
+repositories {
+	mavenCentral()
 }
