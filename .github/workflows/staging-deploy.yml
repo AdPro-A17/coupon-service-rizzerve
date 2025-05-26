@@ -47,5 +47,8 @@ jobs:
               -e PGDATABASE='${PGDATABASE}' \
               -e PGUSER='${PGUSER}' \
               -e PGPASSWORD='${PGPASSWORD}' \
+              -e SERVER_PORT='${SERVER_PORT}' \
+              -e JWT_SECRET='${JWT_SECRET}' \
+              -e FRONTEND_URL='${FRONTEND_URL}' \
               coupon-service-rizzerve:latest
           EOF
