@@ -11,7 +11,7 @@ sonar {
 		property("sonar.projectKey", "coupon-service-rizzerve")
 		property("sonar.projectName", "coupon-service-rizzerve")
 		property("sonar.host.url", "https://sonarqube.cs.ui.ac.id")
-		property("sonar.login", System.getenv("SONAR_TOKEN"))
+		property("sonar.token", System.getenv("SONAR_TOKEN"))
 
 	}
 }
