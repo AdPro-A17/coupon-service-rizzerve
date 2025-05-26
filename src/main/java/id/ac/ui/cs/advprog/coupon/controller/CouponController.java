@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.concurrent.CompletableFuture;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -23,6 +24,7 @@ public class CouponController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public CompletableFuture<String> createCoupon(@RequestBody CouponRequest request) {
         return couponService.createCoupon(toCoupon(request));
     }
@@ -33,6 +35,7 @@ public class CouponController {
     }
 
     @PutMapping("/{code}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String updateCoupon(@PathVariable String code, @RequestBody CouponRequest request) {
         if (!code.equals(request.getCode())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coupon code mismatch");
@@ -46,6 +49,7 @@ public class CouponController {
     }
 
     @DeleteMapping("/{code}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deleteCoupon(@PathVariable String code) {
         try {
             couponService.deleteCoupon(code);
