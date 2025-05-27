@@ -30,7 +30,7 @@ package id.ac.ui.cs.advprog.coupon.service;
             return CompletableFuture.completedFuture("Coupon created successfully");
         }
 
-        @Async
+
         public CompletableFuture<Coupon> getCoupon(String code) {
             return CompletableFuture.supplyAsync(() ->
                     repository.findById(code)
