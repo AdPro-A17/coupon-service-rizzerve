@@ -65,6 +65,11 @@ public class CouponController {
         return couponService.applyCoupon(code, total);
     }
 
+    @PostMapping("/{code}/calculate")
+    public CompletableFuture<BigDecimal> calculateDiscount(@PathVariable String code, @RequestParam BigDecimal total) {
+        return couponService.calculateDiscount(code, total);
+    }
+
     private Coupon toCoupon(CouponRequest request) {
         CouponType couponType = request.getType();
         if (couponType == null) {

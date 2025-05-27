@@ -1,4 +1,4 @@
-    package id.ac.ui.cs.advprog.coupon.service;
+package id.ac.ui.cs.advprog.coupon.service;
 
     import id.ac.ui.cs.advprog.coupon.model.Coupon;
     import id.ac.ui.cs.advprog.coupon.repository.CouponRepository;
@@ -79,6 +79,17 @@
                 coupon.incrementUsedCount();
                 repository.save(coupon);
                 return discounted;
+            });
+        }
+
+        @Async
+        public CompletableFuture<BigDecimal> calculateDiscount(String code, BigDecimal total) {
+            return getCoupon(code).thenApply(coupon -> {
+                if (!coupon.isUsable(total)) {
+                    throw new IllegalStateException("Invalid, expired, or insufficient purchase");
+                }
+                // Calculate discount without incrementing counter or saving
+                return factory.resolve(coupon).apply(total);
             });
         }
 

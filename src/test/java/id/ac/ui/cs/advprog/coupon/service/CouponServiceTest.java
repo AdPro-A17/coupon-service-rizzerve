@@ -368,6 +368,64 @@ class CouponServiceTest {
         assertEquals("Coupon not found: " + nonExistentCode, exception.getCause().getMessage());
     }
 
+    // --- calculateDiscount Tests ---
+    @Test
+    void calculateDiscount_shouldReturnDiscountedTotalWithoutIncrementingUsedCount() throws ExecutionException, InterruptedException {
+        BigDecimal originalTotal = BigDecimal.valueOf(100000);
+        BigDecimal expectedDiscountedTotal = BigDecimal.valueOf(90000); // 100000 - 10000 (fixed discount)
+        int initialUsedCount = validCoupon.getUsedCount();
+
+        // Mock repository and factory behavior
+        when(couponRepository.findById(validCoupon.getCode())).thenReturn(Optional.of(validCoupon));
+        when(discountStrategyFactory.resolve(validCoupon)).thenReturn(discountStrategy);
+        when(discountStrategy.apply(originalTotal)).thenReturn(expectedDiscountedTotal);
+
+        // Call the service method
+        CompletableFuture<BigDecimal> resultFuture = couponService.calculateDiscount(validCoupon.getCode(), originalTotal);
+        BigDecimal actualDiscountedTotal = resultFuture.get();
+
+        // Assertions
+        assertEquals(0, expectedDiscountedTotal.compareTo(actualDiscountedTotal)); // Using compareTo for BigDecimal
+        assertEquals(initialUsedCount, validCoupon.getUsedCount()); // Check used count was NOT incremented
+        // Verify interactions
+        verify(couponRepository, times(1)).findById(validCoupon.getCode());
+        verify(discountStrategyFactory, times(1)).resolve(validCoupon);
+        verify(discountStrategy, times(1)).apply(originalTotal);
+        verify(couponRepository, never()).save(any(Coupon.class)); // Should NOT save
+    }
+
+    @Test
+    void calculateDiscount_shouldThrowIllegalStateException_whenCouponIsUnusable_Expired() {
+        // Create an expired coupon
+        Coupon expiredCoupon = new Coupon("EXPIRED", CouponType.FIXED, BigDecimal.TEN, BigDecimal.ZERO, LocalDateTime.now().minusDays(1), 10);
+        when(couponRepository.findById(expiredCoupon.getCode())).thenReturn(Optional.of(expiredCoupon));
+
+        BigDecimal total = BigDecimal.valueOf(100);
+
+        // Call the service method and assert exception
+        ExecutionException exception = assertThrows(ExecutionException.class, () -> {
+            couponService.calculateDiscount(expiredCoupon.getCode(), total).get();
+        });
+        assertTrue(exception.getCause() instanceof IllegalStateException);
+        assertEquals("Invalid, expired, or insufficient purchase", exception.getCause().getMessage());
+        verify(couponRepository, times(1)).findById(expiredCoupon.getCode());
+        verify(discountStrategyFactory, never()).resolve(any(Coupon.class));
+        verify(couponRepository, never()).save(any(Coupon.class));
+    }
+
+    @Test
+    void calculateDiscount_shouldThrowIllegalStateException_whenCouponNotFound() {
+        String nonExistentCode = "NOTFOUNDCALC";
+        when(couponRepository.findById(nonExistentCode)).thenReturn(Optional.empty());
+        BigDecimal total = BigDecimal.valueOf(100);
+
+        ExecutionException exception = assertThrows(ExecutionException.class, () -> {
+            couponService.calculateDiscount(nonExistentCode, total).get();
+        });
+        assertTrue(exception.getCause() instanceof IllegalStateException);
+        assertEquals("Coupon not found: " + nonExistentCode, exception.getCause().getMessage());
+    }
+
 
     // --- getAllCoupons Tests ---
     @Test
