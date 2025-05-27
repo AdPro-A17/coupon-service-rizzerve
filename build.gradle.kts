@@ -8,8 +8,8 @@ plugins {
 
 sonar {
 	properties {
-		property("sonar.projectKey", "coupon-service-rizzerve")
-		property("sonar.projectName", "coupon-service-rizzerve")
+		property("sonar.projectKey", "coupon-service-rizzervev2")
+		property("sonar.projectName", "coupon-service-rizzervev2")
 		property("sonar.host.url", "https://sonarqube.cs.ui.ac.id")
 		property("sonar.token", System.getenv("SONAR_TOKEN"))
 
