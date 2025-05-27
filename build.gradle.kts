@@ -8,12 +8,17 @@ plugins {
 
 sonar {
 	properties {
-		property("sonar.projectKey", "coupon-service-rizzerve")
-		property("sonar.projectName", "coupon-service-rizzerve")
+		property("sonar.projectKey", "coupon-service-rizzervev2")
+		property("sonar.projectName", "coupon-service-rizzervev2")
 		property("sonar.host.url", "https://sonarqube.cs.ui.ac.id")
+		property("sonar.token", System.getenv("SONAR_TOKEN"))
+
 	}
 }
 
+// Version variables
+val jjwtVersion = "0.11.5"
+val dotenvVersion = "2.3.2"
 
 group = "id.ac.ui.cs.advprog"
 version = "0.0.1-SNAPSHOT"
@@ -44,7 +49,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("io.micrometer:micrometer-registry-prometheus") // Untuk format metrik Prometheus
+	implementation("io.micrometer:micrometer-registry-prometheus")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("org.junit.jupiter:junit-jupiter-api")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")// Untuk format metrik Prometheus
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -84,5 +93,16 @@ tasks.test {
 
 tasks.jacocoTestReport {
 	dependsOn(tasks.test)
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
 
+tasks.withType<Test> {
+	useJUnitPlatform()
+}
+
+repositories {
+	mavenCentral()
 }
