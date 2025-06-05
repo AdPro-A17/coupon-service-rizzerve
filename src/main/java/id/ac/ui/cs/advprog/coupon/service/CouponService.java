@@ -20,7 +20,7 @@ package id.ac.ui.cs.advprog.coupon.service;
             this.factory = factory;
         }
 
-        @Async
+        @Async("taskExecutor")
         public CompletableFuture<String> createCoupon(Coupon coupon) {
             validateCoupon(coupon);
             if (repository.existsById(coupon.getCode())) {
@@ -69,7 +69,7 @@ package id.ac.ui.cs.advprog.coupon.service;
             repository.deleteById(code);
         }
 
-        @Async
+        @Async("taskExecutor")
         public CompletableFuture<BigDecimal> applyCoupon(String code, BigDecimal total) {
             return getCoupon(code).thenApply(coupon -> {
                 if (!coupon.isUsable(total)) {
@@ -82,7 +82,7 @@ package id.ac.ui.cs.advprog.coupon.service;
             });
         }
 
-        @Async
+        @Async("taskExecutor")
         public CompletableFuture<BigDecimal> calculateDiscount(String code, BigDecimal total) {
             return getCoupon(code).thenApply(coupon -> {
                 if (!coupon.isUsable(total)) {
@@ -93,7 +93,7 @@ package id.ac.ui.cs.advprog.coupon.service;
             });
         }
 
-        @Async
+        @Async("taskExecutor")
         public CompletableFuture<Collection<Coupon>> getAllCoupons() {
             return CompletableFuture.supplyAsync(() -> repository.findAll());
         }
