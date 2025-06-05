@@ -1,5 +1,6 @@
 name: Continuous Integration (CI)
 
+## Run CI jobs on all branches by default
 on:
   push:
   pull_request:
@@ -11,31 +12,18 @@ jobs:
     steps:
       - name: Check out the Git repository
         uses: actions/checkout@v4
-
       - name: Set up Java toolchain
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "21"
           cache: "gradle"
-
-      - name: Grant execute permission to Gradle wrapper
+      - name: Set gradlew executable
         run: chmod +x ./gradlew
-
       - name: Run unit tests
-        run: ./gradlew test
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v2.0.2
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=coupon-service-rizzerve
-            -Dsonar.projectName=coupon-service-rizzerve
-            -Dsonar.host.url=https://sonarqube.cs.ui.ac.id
-            -Dsonar.java.binaries=build/classes
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarqube.cs.ui.ac.id
-
-
+          PGHOST: ${{ secrets.DB_HOST }}
+          PGDATABASE: ${{ secrets.DB_NAME }}
+          PGUSER: ${{ secrets.DB_USER }}
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: ./gradlew test
